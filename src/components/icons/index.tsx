@@ -1,0 +1,12 @@
+export { default as CancelCross } from '@/src/components/icons/CancelCross';
+export { default as ChevronRight } from '@/src/components/icons/ChevronRight';
+export { default as Folders } from '@/src/components/icons/Folders';
+export { default as HealthCare } from '@/src/components/icons/HealthCare';
+export { default as Leaf } from '@/src/components/icons/Leaf';
+export { default as Leaves } from '@/src/components/icons/Leaves';
+export { default as Message } from '@/src/components/icons/Message';
+export { default as Profile } from '@/src/components/icons/Profile';
+export { default as Scan } from '@/src/components/icons/Scan';
+export { default as Scanner } from '@/src/components/icons/Scanner';
+export { default as Search } from '@/src/components/icons/Search';
+export { default as SpeedMeter } from '@/src/components/icons/SpeedMeter';

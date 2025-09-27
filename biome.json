@@ -1,0 +1,93 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": ["src/**/*.{ts,tsx,js,jsx}", "app.json", "expo-env.d.ts", "*.{ts,tsx,js,jsx}"],
+    "experimentalScannerIgnores": [
+      "node_modules/**",
+      ".expo/**",
+      "dist/**",
+      "build/**",
+      ".next/**",
+      "coverage/**",
+      "*.config.{js,ts}",
+      "metro.config.{js,ts}",
+      "babel.config.{js,ts}"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "lineEnding": "lf"
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "a11y": {
+        "noSvgWithoutTitle": "off"
+      },
+      "recommended": true,
+      "correctness": {
+        "useExhaustiveDependencies": "warn",
+        "useHookAtTopLevel": "error",
+        "noUnusedVariables": "error",
+        "useUniqueElementIds": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noArrayIndexKey": "warn"
+      },
+      "style": {
+        "useImportType": "off",
+        "useConst": "error",
+        "useTemplate": "warn"
+      },
+      "performance": {
+        "noAccumulatingSpread": "warn",
+        "noDelete": "error"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "warn",
+        "noVoid": "error"
+      },
+      "nursery": {
+        "useSortedClasses": "off"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "es5",
+      "bracketSpacing": true,
+      "bracketSameLine": false,
+      "arrowParentheses": "always"
+    }
+  },
+  "json": {
+    "formatter": {
+      "indentStyle": "space",
+      "indentWidth": 2
+    }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on"
+        }
+      }
+    }
+  }
+}
