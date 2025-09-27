@@ -1,87 +1,124 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { FC } from 'react';
+import { FC, ReactNode, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import CommonGridView from '@/src/components/common/CommonGridView';
-import UiEmptyState from '@/src/components/ui/UiEmptyState';
-import UiErrorState from '@/src/components/ui/UiErrorState';
+import CommonInfinityFlatList from '@/src/components/common/CommonInfinityFlatList';
 import UiImage from '@/src/components/ui/UiImage';
-import UiSkeletonGrid from '@/src/components/ui/UiSkeletonGrid';
 import { useGetCategoriesQuery } from '@/src/services/categories';
 import { Colors, getColorWithOpacity, SemanticColors, Typography } from '@/src/theme';
+import type { Category } from '@/src/types';
 
-const HomeCategoriesList: FC = () => {
-  const { data, isLoading, error, refetch } = useGetCategoriesQuery();
+interface Props {
+  onScrollBeginDrag?: () => void;
+  renderHeader?: () => ReactNode;
+}
 
-  if (isLoading) {
-    return <UiSkeletonGrid numColumns={2} numRows={3} itemSpacing={16} rowSpacing={11} />;
-  }
+const HomeCategoriesList: FC<Props> = (props) => {
+  const [page, setPage] = useState(1);
 
-  if (error) {
+  const { data, isLoading, error, refetch, isFetching } = useGetCategoriesQuery({
+    page,
+    pageSize: 25,
+  });
+
+  const transformData = (categories: Category[]) => {
+    const data = [...categories];
+    if (data.length % 2 !== 0) {
+      data.push({} as Category);
+    }
+    return data;
+  };
+
+  const renderCategory = ({ item }: { item: Category; index: number }) => {
+    if (!item.id) {
+      return <View style={styles.emptyItem} />;
+    }
+
     return (
-      <UiErrorState
-        message="Failed to load plant categories"
-        onRetry={refetch}
-        retryText="Retry"
-        compact
-      />
+      <View style={styles.itemContainer}>
+        <LinearGradient
+          locations={[1, 0]}
+          end={{ x: 0, y: 0 }}
+          start={{ x: 1, y: 1 }}
+          style={styles.gradient}
+          colors={[Colors.white, Colors['sage-50']]}
+        />
+        <Text style={styles.title}>
+          {item.title.split(' ').length === 2 ? item.title.split(' ').join('\n') : item.title}
+        </Text>
+        {item.image && (
+          <UiImage
+            source={{ uri: item.image.url }}
+            previewUrl={item.image.previewUrl}
+            style={styles.plantImage}
+            width={item.image.width}
+            height={item.image.height}
+            contentFit="cover"
+            accessibilityLabel={item.image.alternativeText || `${item.title} plant image`}
+          />
+        )}
+      </View>
     );
-  }
-
-  if (!data || data.length === 0) {
-    return (
-      <UiEmptyState
-        title="No plant categories available"
-        message="Categories will appear here when they're added to the system."
-        onAction={refetch}
-        actionText="Refresh"
-        compact
-      />
-    );
-  }
+  };
 
   return (
-    <CommonGridView
-      scrollEnabled={false}
+    <CommonInfinityFlatList
       data={data}
-      keyExtractor={(item) => item.id.toString()}
+      isLoading={isLoading}
+      error={error}
+      isFetching={isFetching}
+      refetch={refetch}
+      page={page}
+      setPage={setPage}
+      pageSize={25}
+      transformData={transformData}
+      renderItem={renderCategory}
+      keyExtractor={(item, index) => (item.id ? item.id.toString() : `empty-${index}`)}
       numColumns={2}
-      itemSpacing={16}
-      renderItem={({ item }) => (
-        <View
-          style={styles.itemContainer}
-          accessible={true}
-          accessibilityRole="button"
-          accessibilityLabel={`${item.title} plant category`}
-          accessibilityHint="Tap to explore this plant category"
-        >
-          <LinearGradient
-            locations={[1, 0]}
-            end={{ x: 0, y: 0 }}
-            start={{ x: 1, y: 1 }}
-            style={styles.gradient}
-            colors={[Colors.white, Colors['sage-50']]}
-          />
-          <Text style={styles.title} accessibilityRole="text" accessibilityLabel={item.title}>
-            {item.title.split(' ').length === 2 ? item.title.split(' ').join('\n') : item.title}
-          </Text>
-          {item.image && (
-            <UiImage
-              source={{ uri: item.image.url }}
-              previewUrl={item.image.previewUrl}
-              style={styles.plantImage}
-              width={item.image.width}
-              height={item.image.height}
-              contentFit="cover"
-              accessibilityLabel={item.image.alternativeText || `${item.title} plant image`}
-            />
-          )}
-        </View>
-      )}
+      columnWrapperStyle={styles.row}
+      contentContainerStyle={styles.flatListContainer}
+      ListHeaderComponent={props.renderHeader}
+      showsVerticalScrollIndicator={false}
+      onScrollBeginDrag={props.onScrollBeginDrag}
+      onEndReachedThreshold={0.1}
+      getItemLayout={undefined}
+      emptyStateProps={{
+        title: 'No plant categories available',
+        message: "Categories will appear here when they're added to the system.",
+        actionText: 'Refresh',
+      }}
+      errorStateProps={{
+        message: 'Failed to load plant categories',
+        retryText: 'Retry',
+      }}
+      skeletonProps={{
+        numColumns: 2,
+        numRows: 3,
+        itemSpacing: 16,
+        rowSpacing: 11,
+      }}
     />
   );
 };
 
 const styles = StyleSheet.create({
+  flatListContainer: {
+    paddingBottom: 16,
+  },
+
+  categoriesHeaderContainer: {
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  categoriesTitle: {
+    fontSize: 24,
+    fontFamily: Typography.rubik.bold,
+    color: SemanticColors.text,
+    marginBottom: 16,
+  },
+  row: {
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+  },
   title: {
     fontSize: 16,
     lineHeight: 21,
@@ -106,6 +143,8 @@ const styles = StyleSheet.create({
     position: 'relative',
     borderColor: getColorWithOpacity(Colors['gray-700'], 10),
     marginBottom: 11,
+    flex: 1,
+    marginHorizontal: 8,
   },
   plantImage: {
     right: 0,
@@ -113,6 +152,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     position: 'absolute',
+  },
+  emptyItem: {
+    flex: 1,
+    marginHorizontal: 8,
   },
 });
 

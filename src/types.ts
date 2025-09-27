@@ -21,19 +21,33 @@ export interface Category {
 export interface CategoryImage {
   id: number;
   name: string;
+  alternativeText: string | null;
+  caption: string | null;
   width: number;
   height: number;
+  formats: unknown | null;
   hash: string;
   ext: string;
   mime: string;
   size: number;
   url: string;
-  provider: string;
-  caption: string | null;
-  formats: unknown | null;
   previewUrl: string | null;
-  alternativeText: string | null;
+  provider: string;
   provider_metadata: unknown | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface PaginationMeta {
+  page: number;
+  pageSize: number;
+  pageCount: number;
+  total: number;
+}
+
+export interface ApiResponse<T> {
+  data: T;
+  meta: {
+    pagination: PaginationMeta;
+  };
 }
