@@ -118,7 +118,6 @@ const CommonInfinityFlatList = <T extends { id?: number | string }>({
     );
   }
 
-  // Error state
   if (error) {
     return (
       <UiErrorState message={errorMessage} onRetry={handleRefresh} retryText="Retry" compact />

@@ -37,7 +37,8 @@ const UiGradientText: FC<Props> = ({
   style,
 }) => {
   const svgHeight = lineHeight || fontSize * 1.2;
-  const svgWidth = children.length * fontSize * 0.6; // Approximate width based on character count
+
+  const svgWidth = children.length * fontSize * 0.6;
 
   const gradientId = `gradient-${Math.random().toString(36).substr(2, 9)}`;
 
