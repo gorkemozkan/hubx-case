@@ -17,8 +17,7 @@ const CommonDotsIndicator: FC<Props> = (props) => {
     <View style={[styles.container, props.containerStyle]}>
       {Array.from({ length: props.totalCount }, (_, index) => (
         <View
-          // biome-ignore lint/suspicious/noArrayIndexKey: Dots indicator requires stable index-based keys for consistent rendering
-          key={index}
+          key={`dot-${index}-${props.totalCount}`}
           style={[styles.dot, props.activeIndex === index && styles.activeDot]}
         />
       ))}
