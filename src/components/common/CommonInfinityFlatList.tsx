@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, FlatListProps, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, FlatListProps, StyleSheet, Text, View } from 'react-native';
 import UiEmptyState from '@/src/components/ui/UiEmptyState';
 import UiErrorState from '@/src/components/ui/UiErrorState';
 import UiSkeletonGrid from '@/src/components/ui/UiSkeletonGrid';
@@ -8,9 +8,7 @@ import type { PaginationMeta } from '@/src/types';
 
 export interface InfinityFlatListData<T> {
   data: T[];
-  meta: {
-    pagination: PaginationMeta;
-  };
+  meta: { pagination: PaginationMeta };
 }
 
 export interface Props<T>
@@ -22,36 +20,26 @@ export interface Props<T>
   refetch: () => void;
   page: number;
   setPage: (page: number | ((prev: number) => number)) => void;
-  pageSize?: number;
   transformData?: (data: T[]) => T[];
-  emptyStateProps?: {
-    title?: string;
-    message?: string;
-    actionText?: string;
-  };
-  errorStateProps?: {
-    message?: string;
-    retryText?: string;
-  };
-  skeletonProps?: {
-    numColumns?: number;
-    numRows?: number;
-    itemSpacing?: number;
-    rowSpacing?: number;
-  };
+  emptyTitle?: string;
+  emptyMessage?: string;
+  errorMessage?: string;
   showLoadMoreButton?: boolean;
   loadMoreText?: string;
-  onEndReachedThreshold?: number;
+  skeletonColumns?: number;
+  skeletonRows?: number;
 }
 
-function useInfinityListState<T>(
+const useInfinityList = <T,>(
   data: InfinityFlatListData<T> | undefined,
   page: number,
   setPage: (page: number | ((prev: number) => number)) => void,
-  refetch: () => void
-) {
+  refetch: () => void,
+  isFetching: boolean,
+  isLoading: boolean,
+  showLoadMoreButton: boolean
+) => {
   const [allItems, setAllItems] = useState<T[]>([]);
-  const [hasMoreData, setHasMoreData] = useState(true);
 
   useEffect(() => {
     if (data) {
@@ -60,35 +48,18 @@ function useInfinityListState<T>(
       } else {
         setAllItems((prev) => [...prev, ...data.data]);
       }
-      setHasMoreData(page < data.meta.pagination.pageCount);
     }
   }, [data, page]);
+
+  const hasNextPage = data ? page < data.meta.pagination.pageCount : false;
+
+  const isLoadingMore = isFetching && !isLoading;
 
   const handleRefresh = useCallback(() => {
     setPage(1);
     setAllItems([]);
-    setHasMoreData(true);
     refetch();
   }, [refetch, setPage]);
-
-  return {
-    allItems,
-    hasMoreData,
-    handleRefresh,
-  };
-}
-
-function useInfinityListActions<T>(
-  data: InfinityFlatListData<T> | undefined,
-  page: number,
-  setPage: (page: number | ((prev: number) => number)) => void,
-  hasMoreData: boolean,
-  isFetching: boolean,
-  isLoading: boolean,
-  showLoadMoreButton: boolean
-) {
-  const hasNextPage = hasMoreData && data ? page < data.meta.pagination.pageCount : false;
-  const isLoadingMore = isFetching && !isLoading;
 
   const handleLoadMore = useCallback(() => {
     if (hasNextPage && !isLoadingMore) {
@@ -97,56 +68,81 @@ function useInfinityListActions<T>(
   }, [hasNextPage, isLoadingMore, setPage]);
 
   const handleEndReached = useCallback(() => {
-    if (!showLoadMoreButton) {
+    if (!showLoadMoreButton && hasNextPage) {
       handleLoadMore();
     }
-  }, [handleLoadMore, showLoadMoreButton]);
+  }, [handleLoadMore, showLoadMoreButton, hasNextPage]);
 
   return {
+    allItems,
     hasNextPage,
     isLoadingMore,
+    handleRefresh,
     handleLoadMore,
     handleEndReached,
   };
-}
+};
 
-function InfinityFlatListContent<T extends { id?: number | string }>({
+const CommonInfinityFlatList = <T extends { id?: number | string }>({
   data,
-  allItems,
+  isLoading,
+  error,
+  isFetching,
+  refetch,
+  page,
+  setPage,
   transformData,
-  hasNextPage,
-  isLoadingMore,
-  handleLoadMore,
-  handleEndReached,
-  showLoadMoreButton,
-  loadMoreText,
+  emptyTitle = 'No data available',
+  emptyMessage = 'Data will appear here when available.',
+  errorMessage = 'Failed to load data',
+  showLoadMoreButton = false,
+  loadMoreText = 'Load More',
+  skeletonColumns = 2,
+  skeletonRows = 3,
   renderItem,
   keyExtractor,
-  onEndReachedThreshold,
+  onEndReachedThreshold = 0.1,
   ...flatListProps
-}: {
-  data?: InfinityFlatListData<T>;
-  allItems: T[];
-  transformData?: (data: T[]) => T[];
-  hasNextPage: boolean;
-  isLoadingMore: boolean;
-  handleLoadMore: () => void;
-  handleEndReached: () => void;
-  showLoadMoreButton?: boolean;
-  loadMoreText?: string;
-  renderItem: FlatListProps<T>['renderItem'];
-  keyExtractor?: FlatListProps<T>['keyExtractor'];
-  onEndReachedThreshold?: number;
-} & Omit<
-  FlatListProps<T>,
-  'data' | 'onEndReached' | 'ListFooterComponent' | 'renderItem' | 'keyExtractor'
->) {
+}: Props<T>) => {
+  const { allItems, hasNextPage, isLoadingMore, handleRefresh, handleLoadMore, handleEndReached } =
+    useInfinityList(data, page, setPage, refetch, isFetching, isLoading, showLoadMoreButton);
+
+  if (isLoading && page === 1) {
+    return (
+      <UiSkeletonGrid
+        numColumns={skeletonColumns}
+        numRows={skeletonRows}
+        itemSpacing={16}
+        rowSpacing={11}
+      />
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <UiErrorState message={errorMessage} onRetry={handleRefresh} retryText="Retry" compact />
+    );
+  }
+
+  if (!data || allItems.length === 0) {
+    return (
+      <UiEmptyState
+        compact
+        title={emptyTitle}
+        message={emptyMessage}
+        onAction={handleRefresh}
+        actionText="Refresh"
+      />
+    );
+  }
+
   const processedData = transformData ? transformData(allItems) : allItems;
 
   const renderFooter = () => {
     if (isLoadingMore) {
       return (
-        <View style={footerStyles.loadingMore}>
+        <View style={styles.loadingMore}>
           <ActivityIndicator size="small" color={Colors['sage-500']} />
         </View>
       );
@@ -154,15 +150,15 @@ function InfinityFlatListContent<T extends { id?: number | string }>({
 
     if (hasNextPage && showLoadMoreButton) {
       return (
-        <View style={footerStyles.loadMoreButton}>
+        <View style={styles.loadMoreButton}>
           <Text
-            style={footerStyles.loadMoreText}
+            style={styles.loadMoreText}
             onPress={handleLoadMore}
             accessible={true}
             accessibilityRole="button"
-            accessibilityLabel={`Load more ${loadMoreText?.toLowerCase() || 'items'}`}
+            accessibilityLabel={`Load more ${loadMoreText.toLowerCase()}`}
           >
-            {loadMoreText || 'Load More'}
+            {loadMoreText}
           </Text>
         </View>
       );
@@ -179,7 +175,7 @@ function InfinityFlatListContent<T extends { id?: number | string }>({
         keyExtractor || ((item, index) => (item.id ? item.id.toString() : `item-${index}`))
       }
       ListFooterComponent={renderFooter}
-      onEndReached={hasNextPage ? handleEndReached : undefined}
+      onEndReached={handleEndReached}
       onEndReachedThreshold={onEndReachedThreshold}
       removeClippedSubviews={true}
       maxToRenderPerBatch={10}
@@ -189,106 +185,16 @@ function InfinityFlatListContent<T extends { id?: number | string }>({
       {...flatListProps}
     />
   );
-}
+};
 
-function CommonInfinityFlatList<T extends { id?: number | string }>({
-  data,
-  isLoading,
-  error,
-  isFetching,
-  refetch,
-  page,
-  setPage,
-  pageSize = 25,
-  transformData,
-  emptyStateProps,
-  errorStateProps,
-  skeletonProps,
-  showLoadMoreButton = false,
-  loadMoreText = 'Load More',
-  onEndReachedThreshold = 0.1,
-  renderItem,
-  keyExtractor,
-  ...flatListProps
-}: Props<T>) {
-  const { allItems, hasMoreData, handleRefresh } = useInfinityListState(
-    data,
-    page,
-    setPage,
-    refetch
-  );
-
-  const { hasNextPage, isLoadingMore, handleLoadMore, handleEndReached } = useInfinityListActions(
-    data,
-    page,
-    setPage,
-    hasMoreData,
-    isFetching,
-    isLoading,
-    showLoadMoreButton
-  );
-
-  if (isLoading && page === 1) {
-    return (
-      <UiSkeletonGrid
-        numColumns={skeletonProps?.numColumns || 2}
-        numRows={skeletonProps?.numRows || 3}
-        itemSpacing={skeletonProps?.itemSpacing || 16}
-        rowSpacing={skeletonProps?.rowSpacing || 11}
-      />
-    );
-  }
-
-  if (error) {
-    return (
-      <UiErrorState
-        message={errorStateProps?.message || 'Failed to load data'}
-        onRetry={handleRefresh}
-        retryText={errorStateProps?.retryText || 'Retry'}
-        compact
-      />
-    );
-  }
-
-  if (!data || allItems.length === 0) {
-    return (
-      <UiEmptyState
-        title={emptyStateProps?.title || 'No data available'}
-        message={emptyStateProps?.message || 'Data will appear here when available.'}
-        onAction={handleRefresh}
-        actionText={emptyStateProps?.actionText || 'Refresh'}
-        compact
-      />
-    );
-  }
-
-  return (
-    <InfinityFlatListContent
-      data={data}
-      allItems={allItems}
-      transformData={transformData}
-      hasNextPage={hasNextPage}
-      isLoadingMore={isLoadingMore}
-      handleLoadMore={handleLoadMore}
-      handleEndReached={handleEndReached}
-      showLoadMoreButton={showLoadMoreButton}
-      loadMoreText={loadMoreText}
-      renderItem={renderItem}
-      keyExtractor={keyExtractor}
-      onEndReachedThreshold={onEndReachedThreshold}
-      {...flatListProps}
-    />
-  );
-}
-
-const footerStyles = {
+const styles = StyleSheet.create({
   loadingMore: {
     paddingVertical: 16,
-    alignItems: 'center' as const,
+    textAlign: 'center',
   },
   loadMoreButton: {
     paddingVertical: 16,
-    alignItems: 'center' as const,
+    alignItems: 'center',
     marginTop: 8,
   },
   loadMoreText: {
@@ -301,8 +207,8 @@ const footerStyles = {
     borderWidth: 1,
     borderColor: Colors['sage-200'],
     backgroundColor: Colors['sage-50'],
-    textAlign: 'center' as const,
+    textAlign: 'center',
   },
-};
+});
 
 export default CommonInfinityFlatList;

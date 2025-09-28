@@ -69,7 +69,6 @@ const HomeCategoriesList: FC<Props> = (props) => {
       refetch={refetch}
       page={page}
       setPage={setPage}
-      pageSize={25}
       transformData={transformData}
       renderItem={renderCategory}
       keyExtractor={(item, index) => (item.id ? item.id.toString() : `empty-${index}`)}
@@ -81,21 +80,13 @@ const HomeCategoriesList: FC<Props> = (props) => {
       onScrollBeginDrag={props.onScrollBeginDrag}
       onEndReachedThreshold={0.1}
       getItemLayout={undefined}
-      emptyStateProps={{
-        title: 'No plant categories available',
-        message: "Categories will appear here when they're added to the system.",
-        actionText: 'Refresh',
-      }}
-      errorStateProps={{
-        message: 'Failed to load plant categories',
-        retryText: 'Retry',
-      }}
-      skeletonProps={{
-        numColumns: 2,
-        numRows: 3,
-        itemSpacing: 16,
-        rowSpacing: 11,
-      }}
+      emptyTitle="No plant categories available"
+      emptyMessage="Categories will appear here when they're added to the system."
+      errorMessage="Failed to load plant categories"
+      showLoadMoreButton={false}
+      loadMoreText="Load More"
+      skeletonColumns={2}
+      skeletonRows={3}
     />
   );
 };

@@ -43,12 +43,12 @@ const styles = StyleSheet.create({
   container: {
     gap: 16,
     height: 64,
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
     display: 'flex',
-    flexDirection: 'row',
     paddingLeft: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+    paddingVertical: 16,
+    flexDirection: 'row',
     backgroundColor: Colors['brown-900'],
   },
   inner: {

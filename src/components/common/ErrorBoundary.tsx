@@ -46,9 +46,9 @@ class ErrorBoundary extends Component<Props, State> {
       return (
         <View style={styles.container}>
           <UiErrorState
-            message={this.state.error?.message || 'Something went wrong'}
-            onRetry={this.handleReset}
             retryText="Try Again"
+            onRetry={this.handleReset}
+            message={this.state.error?.message || 'Something went wrong'}
           />
         </View>
       );
