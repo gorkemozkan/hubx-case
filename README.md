@@ -71,11 +71,11 @@ EXPO_PUBLIC_API_URL=https://your-api-endpoint.com
 ## Screenshots
 
 <div align="center">
-  <img src="assets/images/ss/ss-1.png" alt="App Screenshot 1" width="200"/>
-  <img src="assets/images/ss/ss-2.png" alt="App Screenshot 2" width="200"/>
-  <img src="assets/images/ss/ss-3.png" alt="App Screenshot 3" width="200"/>
-  <img src="assets/images/ss/ss-4.png" alt="App Screenshot 4" width="200"/>
-  <img src="assets/images/ss/ss-5.png" alt="App Screenshot 5" width="200"/>
+  <img src="assets/images/screenshots/ios/1.png" alt="App Screenshot 1" width="200"/>
+  <img src="assets/images/screenshots/ios/2.png" alt="App Screenshot 2" width="200"/>
+  <img src="assets/images/screenshots/ios/3.png" alt="App Screenshot 3" width="200"/>
+  <img src="assets/images/screenshots/ios/4.png" alt="App Screenshot 4" width="200"/>
+  <img src="assets/images/screenshots/ios/5.png" alt="App Screenshot 5" width="200"/>
 </div>
 
 ## Contact
