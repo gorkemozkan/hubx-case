@@ -12,7 +12,7 @@ import { TypographySource } from '@/src/theme';
 
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+const RootLayout = () => {
   const [fontsLoaded] = useFonts({
     'Rubik-Light': require('../../assets/fonts/Rubik-Light.otf'),
     'Rubik-Regular': require('../../assets/fonts/Rubik-Regular.otf'),
@@ -62,4 +62,6 @@ export default function RootLayout() {
       </ThemeProvider>
     </ErrorBoundary>
   );
-}
+};
+
+export default RootLayout;

@@ -13,13 +13,13 @@ interface Props<T> {
 
 const { width: screenWidth } = Dimensions.get('window');
 
-function CommonCarousel<T>({
+const CommonCarousel = <T,>({
   itemWidth = screenWidth,
   spacing = 0,
   initialIndex = 0,
   keyExtractor,
   ...props
-}: Props<T>) {
+}: Props<T>) => {
   const flatListRef = useRef<FlatList>(null);
 
   const viewabilityConfig = {
@@ -73,6 +73,6 @@ function CommonCarousel<T>({
       }}
     />
   );
-}
+};
 
 export default CommonCarousel;

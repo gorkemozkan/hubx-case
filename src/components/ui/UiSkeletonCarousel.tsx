@@ -1,7 +1,7 @@
 import { FC } from 'react';
-import { ScrollView, StyleSheet, View, ViewStyle } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import UiSkeleton from '@/src/components/ui/UiSkeleton';
-import { SemanticColors, Spacing } from '@/src/theme';
+import { SemanticColors, Spacing, Typography } from '@/src/theme';
 
 export interface Props {
   itemWidth?: number;
@@ -9,6 +9,8 @@ export interface Props {
   itemSpacing?: number;
   numItems?: number;
   style?: ViewStyle;
+  showTitle?: boolean;
+  title?: string;
 }
 
 const UiSkeletonCarousel: FC<Props> = ({
@@ -17,6 +19,8 @@ const UiSkeletonCarousel: FC<Props> = ({
   itemSpacing = 16,
   numItems = 3,
   style,
+  showTitle = true,
+  title = 'Get Started',
 }) => {
   const renderSkeletonItem = (index: number) => (
     <View
@@ -40,14 +44,18 @@ const UiSkeletonCarousel: FC<Props> = ({
   );
 
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.scrollContainer}
-      style={style}
-    >
-      {Array.from({ length: numItems }, (_, index) => renderSkeletonItem(index))}
-    </ScrollView>
+    <View style={style}>
+      {showTitle && (
+        <Text style={styles.title}>{title}</Text>
+      )}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContainer}
+      >
+        {Array.from({ length: numItems }, (_, index) => renderSkeletonItem(index))}
+      </ScrollView>
+    </View>
   );
 };
 
@@ -77,7 +85,14 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xs,
   },
   scrollContainer: {
-    paddingHorizontal: Spacing.md,
+    paddingRight: Spacing.md,
+  },
+  title: {
+    fontSize: 15,
+    lineHeight: 20,
+    letterSpacing: -0.24,
+    fontFamily: Typography.rubik.medium,
+    marginBottom: 16,
   },
 });
 
