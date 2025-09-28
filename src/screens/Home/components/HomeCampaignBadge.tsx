@@ -8,7 +8,12 @@ const HomeCampaignBadge = () => {
   return (
     <View style={styles.container}>
       <View style={styles.inner}>
-        <UiImage source={require('@/assets/images/message.png')} width={36} height={36} />
+        <UiImage
+          source={require('@/assets/images/message.png')}
+          width={54}
+          height={54}
+          contentFit="contain"
+        />
         <View style={styles.content}>
           <UiGradientText
             direction="vertical"
@@ -17,7 +22,10 @@ const HomeCampaignBadge = () => {
               { offset: '100%', color: Colors['amber-600'] },
             ]}
           >
-            FREE Premium Available
+            {[
+              { text: 'FREE', fontFamily: Typography.sfProText.bold },
+              { text: ' Premium Available', fontFamily: Typography.sfProText.semiBold },
+            ]}
           </UiGradientText>
           <UiGradientText
             gradientStops={[
@@ -30,7 +38,7 @@ const HomeCampaignBadge = () => {
             direction="vertical"
             fontFamily={Typography.sfProText.regular}
           >
-            Tap to upgrade your account!
+            {[{ text: 'Tap to upgrade your account!', fontFamily: Typography.sfProText.regular }]}
           </UiGradientText>
         </View>
       </View>
@@ -44,18 +52,21 @@ const styles = StyleSheet.create({
     gap: 16,
     height: 64,
     display: 'flex',
-    paddingLeft: 20,
+    paddingLeft: 12,
+    paddingRight: 12,
     borderRadius: 12,
     alignItems: 'center',
     paddingVertical: 16,
     flexDirection: 'row',
     backgroundColor: Colors['brown-900'],
+
+    justifyContent: 'space-between',
+    width: '100%',
   },
   inner: {
     gap: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
   },
   content: {
     gap: 2,
@@ -63,12 +74,6 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 12,
     color: Colors.white,
-  },
-  message: {
-    width: 24,
-    height: 24,
-    flexBasis: 24,
-    flexShrink: 0,
   },
 });
 

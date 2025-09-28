@@ -5,6 +5,7 @@ import Svg, {
   Stop,
   LinearGradient as SvgLinearGradient,
   Text as SvgText,
+  TSpan,
 } from 'react-native-svg';
 import { Typography } from '@/src/theme';
 
@@ -13,8 +14,14 @@ interface GradientStop {
   color: string;
 }
 
+interface TextSegment {
+  text: string;
+  fontWeight?: string | number;
+  fontFamily?: string;
+}
+
 interface Props {
-  children: string;
+  children: string | TextSegment[];
   fontSize?: number;
   fontWeight?: string | number;
   fontFamily?: string;
@@ -38,7 +45,9 @@ const UiGradientText: FC<Props> = ({
 }) => {
   const svgHeight = lineHeight || fontSize * 1.2;
 
-  const svgWidth = children.length * fontSize * 0.6;
+  const textContent =
+    typeof children === 'string' ? children : children.map((segment) => segment.text).join('');
+  const svgWidth = textContent.length * fontSize * 0.6;
 
   const gradientId = `gradient-${Math.random().toString(36).substr(2, 9)}`;
 
@@ -51,6 +60,22 @@ const UiGradientText: FC<Props> = ({
   };
 
   const coordinates = getGradientCoordinates();
+
+  const renderTextContent = () => {
+    if (typeof children === 'string') {
+      return children;
+    }
+
+    return children.map((segment, index) => (
+      <TSpan
+        key={`${segment.text}-${index}`}
+        fontWeight={segment.fontWeight || fontWeight}
+        fontFamily={segment.fontFamily || fontFamily}
+      >
+        {segment.text}
+      </TSpan>
+    ));
+  };
 
   return (
     <View style={[styles.container, style]}>
@@ -76,12 +101,12 @@ const UiGradientText: FC<Props> = ({
           x="0"
           y={fontSize}
           fontSize={fontSize}
-          fontFamily={fontFamily}
-          fontWeight={fontWeight}
+          fontFamily={typeof children === 'string' ? fontFamily : undefined}
+          fontWeight={typeof children === 'string' ? fontWeight : undefined}
           fill={`url(#${gradientId})`}
           letterSpacing={letterSpacing}
         >
-          {children}
+          {renderTextContent()}
         </SvgText>
       </Svg>
     </View>
