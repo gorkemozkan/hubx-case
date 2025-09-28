@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   },
   row: {
     justifyContent: 'space-between',
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
   },
   title: {
     fontSize: 16,
