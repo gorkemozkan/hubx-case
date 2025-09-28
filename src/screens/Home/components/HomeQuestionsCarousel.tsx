@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.24,
     fontFamily: Typography.rubik.medium,
     marginBottom: 16,
+    color: SemanticColors.text,
   },
   questionItem: {
     borderRadius: 12,
