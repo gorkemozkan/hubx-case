@@ -1,6 +1,6 @@
 import { Alert, Linking } from 'react-native';
 
-export async function openUrl(url: string | undefined | null): Promise<void> {
+export const openUrl = async (url: string | undefined | null): Promise<void> => {
   try {
     if (!url || typeof url !== 'string' || url.trim() === '') {
       Alert.alert('Error', 'Invalid link URL');
@@ -16,4 +16,4 @@ export async function openUrl(url: string | undefined | null): Promise<void> {
   } catch (_error) {
     Alert.alert('Error', 'Failed to open link. Please try again later.');
   }
-}
+};
