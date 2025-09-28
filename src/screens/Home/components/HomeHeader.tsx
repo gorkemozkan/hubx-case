@@ -1,14 +1,30 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import UiImage from '@/src/components/ui/UiImage';
 import UiInput from '@/src/components/ui/UiInput';
 import { Colors, getColorWithOpacity, SemanticColors, Typography } from '@/src/theme';
 
+const getTimeBasedGreeting = (): { text: string; emoji: string } => {
+  const hour = new Date().getHours();
+
+  if (hour >= 5 && hour < 12) {
+    return { text: 'Good Morning!', emoji: '🌅' };
+  } else if (hour >= 12 && hour < 18) {
+    return { text: 'Good Afternoon!', emoji: '⛅' };
+  } else {
+    return { text: 'Good Evening!', emoji: '🌙' };
+  }
+};
+
 const HomeHeader: FC = () => {
+  const greeting = useMemo(() => getTimeBasedGreeting(), []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Hi, plant lover!</Text>
-      <Text style={styles.subtitle}>Good Afternoon! ⛅</Text>
+      <Text style={styles.subtitle}>
+        {greeting.text} {greeting.emoji}
+      </Text>
       <UiInput placeholder="Search for plants" />
       <UiImage
         contentFit="contain"
