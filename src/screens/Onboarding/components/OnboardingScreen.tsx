@@ -100,7 +100,12 @@ const OnboardingScreen = () => {
       header={currentStep.title}
       body={
         <View style={styles.imageContainer}>
-          <UiImage source={currentStep.image} style={styles.image} contentFit="cover" />
+          <UiImage
+            showSkeleton={false}
+            source={currentStep.image}
+            style={styles.image}
+            contentFit="cover"
+          />
         </View>
       }
       footer={
